@@ -18,8 +18,14 @@ class SecureHttpClient {
     'https://raw.githubusercontent.com/firebog/Firebog/master/PFS/Firebog-PFS-PSE.txt' // Firebog list
   ];
 
+  // CORRECTED: The network call is removed from the constructor to prevent startup crashes.
   SecureHttpClient(this._innerClient) {
-    forceUpdateBlocklists();
+    _loadLocalBlocklist(); // Load a default list first.
+  }
+
+  /// CORRECTED: This init method will be called *after* app startup.
+  Future<void> init() async {
+    await forceUpdateBlocklists();
   }
 
   /// Triggers a live, on-demand refresh of all threat intelligence feeds.
@@ -45,8 +51,6 @@ class SecureHttpClient {
 
     if (newBlockList.isNotEmpty) {
       _blockList = newBlockList;
-    } else {
-        _loadLocalBlocklist();
     }
   }
 
